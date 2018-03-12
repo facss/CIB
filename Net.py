@@ -8,33 +8,34 @@ import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 import math
 
-
 #naive VAE model
 class VAE (nn.Module):
     def __init__(self,inputsize):
+        '''
+         all parameters need to be initialize in the beginning,or the model will be empty in the training parameters
+        '''
         super(VAE,self).__init__()
-        self.inputsize=inputsize
+        self.fc1=nn.Sequential(
+            nn.Linear(inputsize*inputsize,inputsize*int(inputsize/4)),
+            nn.ReLU(),
+            nn.Linear(inputsize*int(inputsize/4),inputsize*int(inputsize/16))
+        )
+        self.fc21=nn.Linear(inputsize*int(inputsize/16),20)
+        self.fc22=nn.Linear(inputsize*int(inputsize/16),20)
+        self.fc3=nn.Sequential(
+            nn.Linear(20,inputsize*int(inputsize/16)),
+            nn.Linear(inputsize*int(inputsize/16),inputsize*int(inputsize/4)),
+            nn.ReLU(),
+            nn.Linear(inputsize*int(inputsize/4),inputsize*inputsize),
+        )
+        self.sigmoid=nn.Sigmoid()     
         
     def encoder(self,x):
-        self.fc1=nn.Sequential(
-            nn.Linear(self.inputsize*self.inputsize,inputsize*int(self.inputsize/4)),
-            nn.ReLU(),
-            nn.Linear(self.inputsize*int(self.inputsize/4),self.inputsize*int(self.inputsize/16))
-        )
-        self.fc21=nn.Linear(self.inputsize*int(self.inputsize/16),20)
-        self.fc22=nn.Linear(self.inputsize*int(self.inputsize/16),20)
         h1=self.fc1(x)
        
         return self.fc21(h1),self.fc22(h1) 
 
     def decoder(self,z):
-        self.fc3=nn.Sequential(
-            nn.Linear(20,self.inputsize*int(self.inputsize/16)),
-            nn.Linear(self.inputsize*int(self.inputsize/16),self.inputsize*int(self.inputsize/4)),
-            nn.ReLU(),
-            nn.Linear(self.inputsize*int(self.inputsize/4),self.inputsize*self.inputsize),
-        )
-        self.sigmoid=nn.Sigmoid()
         h3=self.sigmoid(self.fc3(z))
         return h3 
 

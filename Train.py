@@ -74,7 +74,7 @@ class ModelTrain(object):
         self.opts=opts
         self.VAEModel=VAEModel
         self.MLPModel=MLPModel
-        self.VAEtrainLoader=VAEtrainLoader
+        self.VAETrainLoader=VAETrainLoader
         self.MLPTrainLoader=MLPTrainLoader
         self.MLPValLoader=MLPValLoader
         self.MLPTestLoader=MLPTestLoader
@@ -115,8 +115,8 @@ class ModelTrain(object):
         for i,traindata in enumerate(self.MLPTrainLoader,0):
             #measure data loading time       
             [img,label]=traindata#load original training data
-            opts.cuda=torch.cuda.is_available()
-            if opts.cuda:
+            self.opts.cuda=torch.cuda.is_available()
+            if  self.opts.cuda:
                 img,label=Variable(img).cuda(),Variable(label).cuda()
             
             #load data into models     
@@ -147,9 +147,9 @@ class ModelTrain(object):
         for i,valdata in enumerate(self.MLPValLoader,0):
             input_var=list()
             [img,label]=valdata
-            opts.cuda=torch.cuda.is_available()
+            self.opts.cuda=torch.cuda.is_available()
             img_var,label_var=Variable(img,volatile=True),Variable(label,volatile=True)
-            if opts.cuda:
+            if  self.opts.cuda:
                 img_var,label_var=img_var.cuda(),label_var.cuda()
             
             img_var=img_var.view(img_var.size()[0],-1)
@@ -170,7 +170,7 @@ class ModelTrain(object):
         VAEcount=Counter()
         
         for epoch in range(0,self.opts.VAE_train_number_epochs):       
-            VAEtrain_epoch(epoch,VAEcount)
+            self.VAEtrain_epoch(epoch,VAEcount)
 
         return VAEcount
         
@@ -178,19 +178,20 @@ class ModelTrain(object):
         #switch to train model
         self.VAEModel.train()
         
-        for i,traindata in enumerate(self.VAEtrain,0):
+        for i,traindata in enumerate(self.VAETrainLoader,0):
             #measure data loading time       
             [img,_]=traindata #load original training data
         
-            opts.cuda=torch.cuda.is_available()
-            if opts.cuda:
+            self.opts.cuda=torch.cuda.is_available()
+            if  self.opts.cuda:
                 img=Variable(img).cuda()
             
             #load data into models
             inputimg=img.view(img.size()[0],-1)
         
             mu,logvar,recon_batch = self.VAEModel(inputimg)
-            loss=VAE_loss_fun(decoded,inputimg)
+            decoded= recon_batch
+            loss=VAE_loss_fun(decoded,inputimg,mu,logvar)
             self.VAEOptim.zero_grad()
             loss.backward()
             self.VAEOptim.step()

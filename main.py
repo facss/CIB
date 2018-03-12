@@ -112,6 +112,7 @@ def main():
     inputsize=Scrambleimglist[0][0].size[0]#image size
     MLPModel=MLP(inputsize,dataParams.num_classes)#Yale is 15,ORL face class number is 40,CMUPIE class number is 68,PUBFIG is 83
     VAEModel=VAE(inputsize)
+    print(VAEModel)    
 
     torch.manual_seed(opts.seed)
     if opts.cuda:
