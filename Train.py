@@ -87,10 +87,10 @@ class ModelTrain(object):
         mlpcount=Counter() 
         #self.FAS.CounterInitialize()
         for epoch in range(self.opts.MLP_Start_epoch,self.opts.MLP_train_number_epochs):       
-            mlptrain_epoch(epoch,mlpcount)
+            self.mlptrain_epoch(epoch,mlpcount)
 
             if (epoch+1)%opts.valfre ==0 and epoch !=0:#save the model
-                val_res=mlpvalidate(self)
+                val_res=self.mlpvalidate()
                 #save the best model
                 is_best=val_res>best_val
                 best_val=max(val_res,best_val)
