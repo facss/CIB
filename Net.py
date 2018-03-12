@@ -18,10 +18,10 @@ class VAE (nn.Module):
         self.encoder=nn.Sequential(
             nn.Linear(inputsize*inputsize,inputsize*(inputsize/4)),
             nn.LeakyReLU(.2),
-            nn.Linear(inputsize*int(inputsize)/4,2*inputsize*int(inputsize/16) ),#2 for mean and variance.        
+            nn.Linear(inputsize*int(inputsize/4）,2*inputsize*int(inputsize/16) ),#2 for mean and variance.        
         )
         self.decoder=nn.Sequential(
-            nn.Linear(inputsize*int(inputsize/16),inputsize*int(inputsize)/4),
+            nn.Linear(inputsize*int(inputsize/16),inputsize*int(inputsize/4)),
             nn.ReLU(),
             nn.Linear(inputsize*int(inputsize/4),inputsize),
             nn.Sigmoid()
