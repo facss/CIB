@@ -110,9 +110,9 @@ def main():
     opts.cuda=torch.cuda.is_available()
     
     inputsize=Scrambleimglist[0][0].size[0]#image size
-    MLPModel=MLP(inputsize,dataParams.num_classes)#Yale is 15,ORL face class number is 40,CMUPIE class number is 68,PUBFIG is 83
+    MLPModel=MLP(inputsize*int(inputsize/16),dataParams.num_classes)#Yale is 15,ORL face class number is 40,CMUPIE class number is 68,PUBFIG is 83
     VAEModel=VAE(inputsize)
-    print(VAEModel)    
+    print(VAEModel)
 
     torch.manual_seed(opts.seed)
     if opts.cuda:
@@ -135,7 +135,7 @@ def main():
         MLP_test_loader,VAEOptimizer,MLPOptimizer)
      
     VAEcount=modelTrain.VAEtrain()
-    mlpcount=modelTrain.mlptrain()
+    mlpcount=modelTrain.mlptrain(best_val)
     #pltfunc.show_plot(mlpcount.counter,mlpcount.loss_history)
     #_,after_tsne,before_tsne, ori_label=calculate_TSNE( MLP_test_loader,MLPModel)
     ##_,X_tsne,Y_tsne, ori_label=test(opts,MLP_test_loader,MLPModel,VAEModel)

@@ -37,7 +37,7 @@ def get_parser():
     ################################# Optimizer #############################################
     parser.add_argument('--MLP_Start_epoch',type=int,default=0,help='the number of reidentify checkpoint start epoch')
     parser.add_argument('--resume',type=str,default='./')
-    parser.add_argument('--MLP_train_number_epochs','mtne',type=int,default=300)
+    parser.add_argument('--MLP_train_number_epochs','-mtne',type=int,default=300)
     parser.add_argument('--VAE_train_number_epochs','-vtne',type=int,default=300)
     parser.add_argument('--lr',type=int,default=0.00001)
     parser.add_argument('--bit_length',type=int,default=64)

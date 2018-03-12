@@ -121,9 +121,9 @@ class ModelTrain(object):
             
             #load data into models     
             inputimg=img.view(img.size()[0],-1)  
-            mu,logvar,recon_batch=self.VAEModel(inputimg)
-            encoded=[mu,logvar]
-            output=self.MLPModel(encoded)
+            fc1,mu,logvar,recon_batch=self.VAEModel(inputimg)
+            #encoded=[mu,logvar]
+            output=self.MLPModel(fc1)
             loss =MLP_loss_fun(output,label)
 
             self.MLPOptim.zero_grad() 
@@ -153,9 +153,9 @@ class ModelTrain(object):
                 img_var,label_var=img_var.cuda(),label_var.cuda()
             
             img_var=img_var.view(img_var.size()[0],-1)
-            mu,logvar,decoded=self.VAEModel(img_var)
-            encoded=[mu,logvar]#combine mu and var to list
-            output=self.MLPModel(encoded)  
+            fc1,mu,logvar,decoded=self.VAEModel(img_var)
+            #encoded=[mu,logvar]#combine mu and var to list
+            output=self.MLPModel(fc1)  
             
             loss_=MLP_loss_fun(output,label_var)          
             losses.update(loss_.data[0], img.size(0))
@@ -189,7 +189,7 @@ class ModelTrain(object):
             #load data into models
             inputimg=img.view(img.size()[0],-1)
         
-            mu,logvar,recon_batch = self.VAEModel(inputimg)
+            fc1,mu,logvar,recon_batch = self.VAEModel(inputimg)
             decoded= recon_batch
             loss=VAE_loss_fun(decoded,inputimg,mu,logvar)
             self.VAEOptim.zero_grad()

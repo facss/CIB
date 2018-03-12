@@ -10,7 +10,8 @@ def VAE_loss_fun(recon_x,x,mu,logvar):
     reconstruction_function.size_average=False
     BCE=reconstruction_function(recon_x,x )
 
-    KLD_element=mu.pow(2).add_(logvar.exp()).mul_(1).mul_(logvar)
+    #KLD=torch.sum(.5*(mu**2+torch.exp(logvar)-logvar-1))
+    KLD_element=mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
     KLD=torch.sum(KLD_element).mul_(0.5)
 
     return BCE+KLD 
