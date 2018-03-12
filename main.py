@@ -28,7 +28,7 @@ from Net import MLP,VAE  #import network
 from Train import ModelTrain,AverageMeter#import trainer
 from Helper import plotfunc,TraverseDataset,ImageScrambling #import some helper function
 from args import get_parser#import args
-from staticParams import params
+from staticParams import YaleParams, ORLParams,PUBFIGParams,CMUPIEParams
 #from test import test #import test 
 #
 #=======================================================================================================
@@ -56,45 +56,46 @@ def main():
 
 ###################################### 0.Image Scrambling and preprocess  images ###########################
     if opts.dataset_name=='Yale':
-        dataparams=params('Yale')
-        Scrambleimglist,class_number=TraverseDataset(dataparams.dataset_dir,opts.n).preprocessYaleDataset(opts.scramble_method) # Yale
+        dataParams=YaleParams
+        Scrambleimglist,class_number=TraverseDataset(dataParams.dataset_dir,opts.n).preprocessYaleDataset(opts.scramble_method) # Yale
     elif opts.dataset_name=='ORL':
-        dataparams=params('ORL')
-        Scrambleimglist,class_number=TraverseDataset(dataparams.dataset_dir,opts.n).preprocessORLDataset(opts.scramble_method)   #ORL
+        dataParams=ORLParams
+        Scrambleimglist,class_number=TraverseDataset(dataParams.dataset_dir,opts.n).preprocessORLDataset(opts.scramble_method)   #ORL
     elif opts.dataset_name=='CMUPIE':  
-        dataparams=params('CMUPIE')
-        Scrambleimglist,class_number=TraverseDataset(dataparams.dataset_dir,opts.n).preprocessCMUPIEDataset(opts.scramble_method)   #CMUPIE
-    else:      
-        dataparams=params('PUBFIG')     
-        Scrambleimglist,class_number=TraverseDataset(dataparams.dataset_dir,opts.n).preprocessPUBFIG83Dataset(opts.scramble_method) # PUBFIG
+        dataParams=CMUPIEParams
+        Scrambleimglist,class_number=TraverseDataset(dataParams.dataset_dir,opts.n).preprocessCMUPIEDataset(opts.scramble_method)   #CMUPIE
+    else:        
+        dataParams=PUBFIGParams
+        Scrambleimglist,class_number=TraverseDataset(dataParams.dataset_dir,opts.n).preprocessPUBFIG83Dataset(opts.scramble_method) # PUBFIG
    
 
     opts.num_classes=class_number
-    print('Data Image Scrambling transforms done. Class number is :{0}',class_number)
+    print('Data Image Scrambling transforms done. Class number is :{}'.format(class_number))
 
 ###################################### 1.Data Loader#################################################
-    VAE_traindata=FaceData(Scrambleimglist,class_number,dataparams,mode='VAEtrain',
+
+    VAE_traindata=FaceData(Scrambleimglist,class_number,dataParams,mode='VAEtrain',
         transform=transforms.Compose([          
             transforms.ToTensor(),
             transforms.Normalize([.5,.5,.5],[.5,.5,.5]),#normalization        
         ]),should_invert=False)
     print('VAE train data loaded done')
     
-    MLP_traindata=FaceData(Scrambleimglist,class_number,dataparams,mode='mlptrain',
+    MLP_traindata=FaceData(Scrambleimglist,class_number,dataParams,mode='mlptrain',
         transform=transforms.Compose([              
             transforms.ToTensor(),
             transforms.Normalize([.5,.5,.5],[.5,.5,.5]),
         ]),should_invert=False)
     print('MLP train data loaded done')
 
-    MLP_valdata=FaceData(Scrambleimglist,class_number,dataparams,mode='mlpvalidate',
+    MLP_valdata=FaceData(Scrambleimglist,class_number,dataParams,mode='mlpvalidate',
         transform=transforms.Compose([       
             transforms.ToTensor(),
             transforms.Normalize([.5,.5,.5],[.5,.5,.5]),
         ]),should_invert=False)
     print('MLP validate data loaded done')
 
-    MLP_testdata=FaceData(Scrambleimglist,class_number,dataparams,mode='mlptest',
+    MLP_testdata=FaceData(Scrambleimglist,class_number,dataParams,mode='mlptest',
         transform=transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([.5,.5,.5],[.5,.5,.5]),
@@ -107,8 +108,9 @@ def main():
     MLP_test_loader=DataLoader(MLP_testdata,shuffle=True,num_workers=opts.num_workers,batch_size=opts.MLP_test_batch_size)
 ###################################### 2. Model ############################################################
     opts.cuda=torch.cuda.is_available()
-    inputsize=arnoldimglist[0][0].size[0]#image size
-    MLPModel=MLP(inputsize,dataparams.num_classes)#Yale is 15,ORL face class number is 40,CMUPIE class number is 68,PUBFIG is 83
+    
+    inputsize=Scrambleimglist[0][0].size[0]#image size
+    MLPModel=MLP(inputsize,dataParams.num_classes)#Yale is 15,ORL face class number is 40,CMUPIE class number is 68,PUBFIG is 83
     VAEModel=VAE(inputsize)
 
     torch.manual_seed(opts.seed)

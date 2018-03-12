@@ -6,7 +6,6 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader,Dataset
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import torchvision.utils
 import numpy as np
@@ -22,6 +21,9 @@ import torch.nn.functional as F
 import visdom
 
 class plotfunc(object):
+    '''
+     show image and some other helper function
+    '''
     def __init__(self):
         super(plotfunc,self).__init__()  
         #self.vis=visdom.Visdom()
@@ -51,6 +53,9 @@ class plotfunc(object):
         plt.savefig('TSNE.png')
 
 class  TraverseDataset(object):
+    '''
+    traverse all datasets to do preprocess
+    '''
     def __init__(self,dataset_dir,n,a=1,b=1):
         super(TraverseDataset,self).__init__()
         self.dataset_dir=dataset_dir
@@ -191,6 +196,9 @@ class  TraverseDataset(object):
         return img_list,class_number#   
 
 class ImageScrambling(object):
+    '''
+    image scramble algorithmns 
+    '''
     def __init__(self,a,b,n):
         super(ImageScrambling,self).__init__()
         self.a=a
@@ -199,11 +207,12 @@ class ImageScrambling(object):
 
     def ChooseTransform(self,ScramleName,img):
         if ScramleName=='Arnold':
-            image=self.ArnoldTransform(self,img)
+            image_choosed=self.ArnoldTransform(img)
         if ScramleName=='Fabonacci':
-            image=self.FibonacciTransform(self,img)
+            image_choosed=self.FibonacciTransform(img)
         if ScramleName=='Magic':
-            image=self.MagicTransform(self,img)
+            image_choosed=self.MagicTransform(img)
+        return image_choosed
 
     def ArnoldTransform(self,img):
         a=self.a 
@@ -228,8 +237,8 @@ class ImageScrambling(object):
                     xx=(x+b*y)%N
                     yy=(a*x+(a*b+1)*y)%N
                     temp=img.getpixel((x,y))
-                    draw.point((xx,yy),fill=img.getpixel((x,y)))       
-            img=image
+                    draw.point((xx,yy),fill=temp)       
+            img=image 
         
         return image
         
